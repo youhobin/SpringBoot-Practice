@@ -5,6 +5,10 @@ import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactor
 import org.springframework.boot.web.server.WebServer;
 import org.springframework.boot.web.servlet.ServletContextInitializer;
 import org.springframework.boot.web.servlet.server.ServletWebServerFactory;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -18,16 +22,26 @@ public class HellobootApplication {
 	public static void main(String[] args) {
 		ServletWebServerFactory serverFactory = new TomcatServletWebServerFactory();
 		WebServer webServer = serverFactory.getWebServer(servletContext -> {
-			servletContext.addServlet("hello", new HttpServlet() {
+			servletContext.addServlet("frontcontroller", new HttpServlet() {
 				@Override
 				protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+					// 인증, 보안, 다국어, 공통 기능
+					if (req.getRequestURI().equals("/hello") && req.getMethod().equals(HttpMethod.GET.name())) { // hello URL일때
+						String name = req.getParameter("name");
 
-					//응답 : 상태코드, 헤더 (바디가 어떤 타입인지), 바디 3가지가 필요
-					resp.setStatus(200);
-					resp.setHeader("Content-Type", "text/plain");
-					resp.getWriter().println("Hello Servlet");
+						//응답 : 상태코드, 헤더 (바디가 어떤 타입인지), 바디 3가지가 필요
+						resp.setStatus(HttpStatus.OK.value());
+						resp.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN_VALUE); //String 값은 오타발생 확률이 있음.
+						resp.getWriter().println("Hello " + name);
+
+					} else if (req.getRequestURI().equals("/user")) {
+
+					} else {
+						resp.setStatus(HttpStatus.NOT_FOUND.value());
+					}
+
 				}
-			}).addMapping("/hello"); //서블릿을 등록하고 매핑을 추가
+			}).addMapping("/*"); //서블릿을 등록하고 매핑을 추가, 프론트컨트롤러에서 모든 매핑추가
 
 		}); // 파라미터로 서블릿 등록 -> 익명클래스를 람다식으로.
 
