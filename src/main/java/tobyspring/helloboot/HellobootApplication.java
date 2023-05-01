@@ -22,6 +22,7 @@ public class HellobootApplication {
 	public static void main(String[] args) {
 		ServletWebServerFactory serverFactory = new TomcatServletWebServerFactory();
 		WebServer webServer = serverFactory.getWebServer(servletContext -> {
+			HelloController helloController = new HelloController();
 			servletContext.addServlet("frontcontroller", new HttpServlet() {
 				@Override
 				protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -29,10 +30,12 @@ public class HellobootApplication {
 					if (req.getRequestURI().equals("/hello") && req.getMethod().equals(HttpMethod.GET.name())) { // hello URL일때
 						String name = req.getParameter("name");
 
+						String ret = helloController.hello(name);
+
 						//응답 : 상태코드, 헤더 (바디가 어떤 타입인지), 바디 3가지가 필요
 						resp.setStatus(HttpStatus.OK.value());
 						resp.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN_VALUE); //String 값은 오타발생 확률이 있음.
-						resp.getWriter().println("Hello " + name);
+						resp.getWriter().println(ret);
 
 					} else if (req.getRequestURI().equals("/user")) {
 
