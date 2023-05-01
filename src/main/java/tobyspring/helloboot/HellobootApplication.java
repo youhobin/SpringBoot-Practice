@@ -27,6 +27,15 @@ import java.io.IOException;
 @Configuration
 @ComponentScan
 public class HellobootApplication {
+	@Bean
+	public ServletWebServerFactory serverFactory() {
+		return new TomcatServletWebServerFactory();
+	}
+
+	@Bean
+	public DispatcherServlet dispatcherServlet() {
+		return new DispatcherServlet();
+	}
 
 	public static void main(String[] args) {
 		// 스프링 컨테이너 만들기
@@ -35,12 +44,13 @@ public class HellobootApplication {
 			protected void onRefresh() {
 				super.onRefresh();
 
-				ServletWebServerFactory serverFactory = new TomcatServletWebServerFactory();
-				WebServer webServer = serverFactory.getWebServer(servletContext -> {
-					servletContext.addServlet("dispatcherServlet",
-						new DispatcherServlet(this) // 자신을 전달하도록
-					).addMapping("/*"); //서블릿을 등록하고 매핑을 추가, 프론트컨트롤러에서 모든 매핑추가
+				ServletWebServerFactory serverFactory = this.getBean(ServletWebServerFactory.class);
+				DispatcherServlet dispatcherServlet = this.getBean(DispatcherServlet.class);
+//				dispatcherServlet.setApplicationContext(this); // 스프링 컨테이너를 지정해줌
 
+				WebServer webServer = serverFactory.getWebServer(servletContext -> {
+					servletContext.addServlet("dispatcherServlet", dispatcherServlet)
+						.addMapping("/*"); //서블릿을 등록하고 매핑을 추가, 프론트컨트롤러에서 모든 매핑추가
 				}); // 파라미터로 서블릿 등록 -> 익명클래스를 람다식으로.
 
 				webServer.start(); // 톰캣 서블릿 컨테이너가 동작
