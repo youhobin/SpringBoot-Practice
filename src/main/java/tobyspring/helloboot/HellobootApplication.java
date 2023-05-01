@@ -5,11 +5,14 @@ import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactor
 import org.springframework.boot.web.server.WebServer;
 import org.springframework.boot.web.servlet.ServletContextInitializer;
 import org.springframework.boot.web.servlet.server.ServletWebServerFactory;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.context.support.GenericWebApplicationContext;
 import org.springframework.web.servlet.DispatcherServlet;
 
@@ -20,24 +23,40 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+@Configuration
 public class HellobootApplication {
+	@Bean
+	public HelloController helloController(HelloService helloService) {
+		return new HelloController(helloService); // 자바 팩토리 메소드
+	}
+
+	@Bean
+	public HelloService helloService() { // 인터페이스 타입으로 리턴하도록.
+		return new SimpleHelloService();
+	}
 
 	public static void main(String[] args) {
 		// 스프링 컨테이너 만들기
-		GenericWebApplicationContext applicationContext = new GenericWebApplicationContext();
-		applicationContext.registerBean(HelloController.class); // 어떤 메타정보로 만들지, 컨트롤러 등록
-		applicationContext.registerBean(SimpleHelloService.class);
+		AnnotationConfigWebApplicationContext applicationContext = new AnnotationConfigWebApplicationContext() { // 애노테이션으로 변경
+			@Override
+			protected void onRefresh() {
+				super.onRefresh();
+
+				ServletWebServerFactory serverFactory = new TomcatServletWebServerFactory();
+				WebServer webServer = serverFactory.getWebServer(servletContext -> {
+					servletContext.addServlet("dispatcherServlet",
+						new DispatcherServlet(this) // 자신을 전달하도록
+					).addMapping("/*"); //서블릿을 등록하고 매핑을 추가, 프론트컨트롤러에서 모든 매핑추가
+
+				}); // 파라미터로 서블릿 등록 -> 익명클래스를 람다식으로.
+
+				webServer.start(); // 톰캣 서블릿 컨테이너가 동작
+			}
+		};
+		applicationContext.register(HellobootApplication.class);
 		applicationContext.refresh(); // 빈 만들어줌.
 
-		ServletWebServerFactory serverFactory = new TomcatServletWebServerFactory();
-		WebServer webServer = serverFactory.getWebServer(servletContext -> {
-			servletContext.addServlet("dispatcherServlet",
-					new DispatcherServlet(applicationContext) // WebApplicationContext 필요
-				).addMapping("/*"); //서블릿을 등록하고 매핑을 추가, 프론트컨트롤러에서 모든 매핑추가
 
-		}); // 파라미터로 서블릿 등록 -> 익명클래스를 람다식으로.
-
-		webServer.start(); // 톰캣 서블릿 컨테이너가 동작
 	}
 
 }
