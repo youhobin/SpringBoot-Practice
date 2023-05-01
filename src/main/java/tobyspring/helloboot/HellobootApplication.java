@@ -6,6 +6,7 @@ import org.springframework.boot.web.server.WebServer;
 import org.springframework.boot.web.servlet.ServletContextInitializer;
 import org.springframework.boot.web.servlet.server.ServletWebServerFactory;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.http.HttpHeaders;
@@ -24,16 +25,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @Configuration
+@ComponentScan
 public class HellobootApplication {
-	@Bean
-	public HelloController helloController(HelloService helloService) {
-		return new HelloController(helloService); // 자바 팩토리 메소드
-	}
-
-	@Bean
-	public HelloService helloService() { // 인터페이스 타입으로 리턴하도록.
-		return new SimpleHelloService();
-	}
 
 	public static void main(String[] args) {
 		// 스프링 컨테이너 만들기
