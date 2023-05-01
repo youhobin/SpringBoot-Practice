@@ -10,18 +10,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.servlet.DispatcherServlet;
 
-@Configuration
-@ComponentScan
+@MySpringBootAnnotation // 만든 SpringBootAnnotation
 public class HellobootApplication {
-	@Bean
-	public ServletWebServerFactory serverFactory() {
-		return new TomcatServletWebServerFactory();
-	}
-
-	@Bean
-	public DispatcherServlet dispatcherServlet() {
-		return new DispatcherServlet();
-	}
 
 	public static void main(String[] args) {
 		// 스프링 컨테이너 만들기
