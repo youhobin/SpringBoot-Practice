@@ -5,6 +5,7 @@ import org.springframework.boot.web.servlet.server.ServletWebServerFactory;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.servlet.DispatcherServlet;
 
+//SpringApplication 의 모습
 public class MySpringApplication {
     public static void run(Class<?> applicationClass, String[]... args) {
         AnnotationConfigWebApplicationContext applicationContext = new AnnotationConfigWebApplicationContext() { // 애노테이션으로 변경
