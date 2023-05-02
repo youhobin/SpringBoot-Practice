@@ -9,10 +9,12 @@ import org.springframework.core.env.Environment;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 import org.springframework.util.ClassUtils;
 import tobyspring.config.ConditionalMyOnClass;
+import tobyspring.config.EnableMyConfigurationProperties;
 import tobyspring.config.MyAutoConfiguration;
 
 @MyAutoConfiguration
 @ConditionalMyOnClass("org.apache.catalina.startup.Tomcat")
+@EnableMyConfigurationProperties(ServerProperties.class)
 public class TomcatWebServerConfig {
 //    @Value("${contextPath:}")    // 같은 이름의 프로퍼티로 치환해줌. 이를 교체하려면 PropertySourcesPlaceholderConfigurer의 빈 필요
 //    String contextPath;
