@@ -14,14 +14,22 @@ import tobyspring.config.MyAutoConfiguration;
 @MyAutoConfiguration
 @ConditionalMyOnClass("org.apache.catalina.startup.Tomcat")
 public class TomcatWebServerConfig {
-    @Value("${contextPath}")    // 같은 이름의 프로퍼티로 치환해줌. 이를 교체하려면 PropertySourcesPlaceholderConfigurer의 빈 필요
-    String contextPath;
+//    @Value("${contextPath:}")    // 같은 이름의 프로퍼티로 치환해줌. 이를 교체하려면 PropertySourcesPlaceholderConfigurer의 빈 필요
+//    String contextPath;
+//
+//    @Value("${port:8080}")  // : 이후 기본값
+//    int port;
 
     @Bean("tomcatWebServerFactory")
     @ConditionalOnMissingBean   // 존재하지 않으면 빈을 등록하도록. 유저 구성 정보 빈은 이미 등록이 되므로.
-    public ServletWebServerFactory servletWebServerFactory() {
+    public ServletWebServerFactory servletWebServerFactory(ServerProperties properties) {
         TomcatServletWebServerFactory factory = new TomcatServletWebServerFactory();
-        factory.setContextPath(this.contextPath); // /app가 URI에 붙게됨
+
+        factory.setContextPath(properties.getContextPath()); // /app가 URI에 붙게됨
+        factory.setPort(properties.getPort());
+
         return factory;
     }
+
+
 }
