@@ -1,5 +1,6 @@
 package tobyspring.config.autoconfig;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
 import org.springframework.boot.web.servlet.server.ServletWebServerFactory;
@@ -13,11 +14,14 @@ import tobyspring.config.MyAutoConfiguration;
 @MyAutoConfiguration
 @ConditionalMyOnClass("org.apache.catalina.startup.Tomcat")
 public class TomcatWebServerConfig {
+    @Value("${contextPath}")    // 같은 이름의 프로퍼티로 치환해줌. 이를 교체하려면 PropertySourcesPlaceholderConfigurer의 빈 필요
+    String contextPath;
+
     @Bean("tomcatWebServerFactory")
     @ConditionalOnMissingBean   // 존재하지 않으면 빈을 등록하도록. 유저 구성 정보 빈은 이미 등록이 되므로.
-    public ServletWebServerFactory servletWebServerFactory(Environment env) {
+    public ServletWebServerFactory servletWebServerFactory() {
         TomcatServletWebServerFactory factory = new TomcatServletWebServerFactory();
-        factory.setContextPath(env.getProperty("contextPath")); // /app가 URI에 붙게됨
+        factory.setContextPath(this.contextPath); // /app가 URI에 붙게됨
         return factory;
     }
 }
