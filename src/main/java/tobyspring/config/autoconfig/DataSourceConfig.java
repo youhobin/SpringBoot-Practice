@@ -20,19 +20,6 @@ import java.sql.Driver;
 @EnableMyConfigurationProperties(MyDataSourceProperties.class)
 @EnableTransactionManagement    //  Enable은 Import함.
 public class DataSourceConfig {
-    @Bean
-    @ConditionalMyOnClass("com.zaxxer.hikari.HikariDataSource")
-    @ConditionalOnMissingBean
-    DataSource dataSource(MyDataSourceProperties properties) throws ClassNotFoundException {
-        SimpleDriverDataSource dataSource = new SimpleDriverDataSource();
-
-        dataSource.setDriverClass((Class<? extends Driver>) Class.forName(properties.getDriverClassName()));
-        dataSource.setUrl(properties.getUrl());
-        dataSource.setUsername(properties.getUsername());
-        dataSource.setPassword(properties.getPassword());
-
-        return dataSource;
-    }
 
     @Bean   // 히카리가 있으면 이거를만들고 없다면 위의 빈 이용
     @ConditionalOnMissingBean
@@ -41,6 +28,20 @@ public class DataSourceConfig {
 
         dataSource.setDriverClassName(properties.getDriverClassName());
         dataSource.setJdbcUrl(properties.getUrl());
+        dataSource.setUsername(properties.getUsername());
+        dataSource.setPassword(properties.getPassword());
+
+        return dataSource;
+    }
+
+    @Bean
+    @ConditionalMyOnClass("com.zaxxer.hikari.HikariDataSource")
+    @ConditionalOnMissingBean
+    DataSource dataSource(MyDataSourceProperties properties) throws ClassNotFoundException {
+        SimpleDriverDataSource dataSource = new SimpleDriverDataSource();
+
+        dataSource.setDriverClass((Class<? extends Driver>) Class.forName(properties.getDriverClassName()));
+        dataSource.setUrl(properties.getUrl());
         dataSource.setUsername(properties.getUsername());
         dataSource.setPassword(properties.getPassword());
 
